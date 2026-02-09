@@ -83,8 +83,8 @@ def recalculate_product(product_id: int, db: Session = Depends(get_db)):
     return product
 
 @router.post("/{product_id}/approve")
-def approve_product(product_id: int, db: Session = Depends(get_db)):
-    """Manually approve product"""
+async def approve_product(product_id: int, db: Session = Depends(get_db)):
+    """Manually approve product and auto-publish if score >= 80"""
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -92,7 +92,25 @@ def approve_product(product_id: int, db: Session = Depends(get_db)):
     product.status = "approved"
     db.commit()
     
-    return {"message": "Product approved", "product_id": product_id}
+    manager = ProductManager(db)
+    manager.log_action(product_id, "approved", reason="Manual approval")
+    
+    # Auto-publish if score >= 80
+    if product.score >= 80:
+        ml_item_id = await manager.publish_to_ml(product_id)
+        if ml_item_id:
+            return {
+                "message": "Product approved and published automatically",
+                "product_id": product_id,
+                "ml_item_id": ml_item_id,
+                "auto_published": True
+            }
+    
+    return {
+        "message": "Product approved",
+        "product_id": product_id,
+        "auto_published": False
+    }
 
 @router.post("/{product_id}/reject")
 def reject_product(product_id: int, reason: str = None, db: Session = Depends(get_db)):
