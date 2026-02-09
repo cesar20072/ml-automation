@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} - ML Automation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #F8F9FA;
+            color: #1A1A1A;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            background: white;
+            padding: 30px 0;
+            border-bottom: 1px solid #E5E7EB;
+            margin-bottom: 40px;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2B5BA6;
+        }
+        
+        .btn-back {
+            padding: 10px 20px;
+            background: #E5E7EB;
+            color: #1A1A1A;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .btn-back:hover {
+            background: #D1D5DB;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .card {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1A1A1A;
+        }
+        
+        .product-image {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: #6B7280;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+        
+        .score-display {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 64px;
+            font-weight: 700;
+        }
+        
+        .score-high {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        
+        .score-medium {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .score-low {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+        
+        .score-breakdown {
+            margin-top: 24px;
+        }
+        
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .status-approved {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        
+        .status-published {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+        
+        .status-needs_approval {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+        
+        .status-rejected {
+            background: #F3F4F6;
+            color: #4B5563;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .btn-approve {
+            background: #00C896;
+            color: white;
+        }
+        
+        .btn-approve:hover {
+            background: #00a87a;
+        }
+        
+        .btn-reject {
+            background: #EF4444;
+            color: white;
+        }
+        
+        .btn-reject:hover {
+            background: #dc2626;
+        }
+        
+        .btn-publish {
+            background: #2B5BA6;
+            color: white;
+        }
+        
+        .btn-publish:hover {
+            background: #234a8a;
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .ml-link {
+            display: inline-block;
+            color: #2B5BA6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .ml-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>📦 Detalle del Producto</h1>
+            <a href="/dashboard/review-products" class="btn-back">← Volver</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="product-grid">
+            <div class="card">
+                <h2 class="card-title">Información General</h2>
+                <img src="{{ product.images[0] if product.images else 'https://via.placeholder.com/500' }}" 
+                     alt="{{ product.name }}" 
+                     class="product-image">
+                
+                <div class="info-row">
+                    <span class="info-label">Nombre</span>
+                    <span class="info-value">{{ product.name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">SKU</span>
+                    <span class="info-value">{{ product.sku }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Categoría</span>
+                    <span class="info-value">{{ product.category or 'Sin categoría' }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Stock</span>
+                    <span class="info-value">{{ product.stock }} unidades</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Estado</span>
+                    <span class="info-value">
+                        <span class="status-badge status-{{ product.status }}">
+                            {% if product.status == 'needs_approval' %}
+                                Necesita aprobación
+                            {% elif product.status == 'approved' %}
+                                Aprobado
+                            {% elif product.status == 'published' %}
+                                Publicado
+                            {% elif product.status == 'rejected' %}
+                                Rechazado
+                            {% else %}
+                                {{ product.status }}
+                            {% endif %}
+                        </span>
+                    </span>
+                </div>
+                {% if product.ml_item_id %}
+                <div class="info-row">
+                    <span class="info-label">Mercado Libre</span>
+                    <span class="info-value">
+                        <a href="{{ product.ml_permalink }}" target="_blank" class="ml-link">
+                            Ver en ML →
+                        </a>
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Score y Análisis</h2>
+                <div class="score-display">
+                    <div class="score-circle {% if product.score >= 80 %}score-high{% elif product.score >= 50 %}score-medium{% else %}score-low{% endif %}">
+                        {{ product.score }}
+                    </div>
+                    <p style="color: #6B7280; font-size: 14px;">
+                        {% if product.score >= 80 %}
+                            ✓ Score excelente - Auto-publicable
+                        {% elif product.score >= 50 %}
+                            ⚠️ Score aceptable - Requiere aprobación
+                        {% else %}
+                            ✗ Score bajo - Revisar precio
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="score-breakdown">
+                    <h3 style="font-size: 16px; margin-bottom: 12px; color: #6B7280;">Desglose del Score</h3>
+                    <div class="score-item">
+                        <span>Margen de ganancia</span>
+                        <span style="font-weight: 600;">{{ "%.0f"|format((product.margin_percentage or 0) / 40 * 40) }}/40</span>
+                    </div>
+                    <div class="score-item">
+                        <span>Competencia</span>
+                        <span style="font-weight: 600;">15/25</span>
+                    </div>
+                    <div class="score-item">
+                        <span>Precio competitivo</span>
+                        <span style="font-weight: 600;">{{ "%.0f"|format(product.score - ((product.margin_percentage or 0) / 40 * 40) - 15 - 10) }}/20</span>
+                    </div>
+                    <div class="score-item">
+                        <span>Tendencia</span>
+                        <span style="font-weight: 600;">10/15</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Costos y Precios</h2>
+                <div class="info-row">
+                    <span class="info-label">Costo base</span>
+                    <span class="info-value">${{ "%.2f"|format(product.base_cost) }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Comisión ML</span>
+                    <span class="info-value">{{ "%.2f"|format(product.ml_commission_percentage or 0) }}% (${{ "%.2f"|format(product.ml_commission_amount or 0) }})</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Costo de envío</span>
+                    <span class="info-value">${{ "%.2f"|format(product.shipping_cost or 0) }}</span>
+                </div>
+                <div class="info-row" style="border-top: 2px solid #2B5BA6; padding-top: 16px; margin-top: 16px;">
+                    <span class="info-label" style="font-size: 18px; color: #2B5BA6;">Precio final</span>
+                    <span class="info-value" style="font-size: 24px; color: #2B5BA6;">${{ "%.2f"|format(product.final_price or 0) }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label" style="font-size: 18px; color: #00C896;">Margen</span>
+                    <span class="info-value" style="font-size: 24px; color: #00C896;">{{ "%.2f"|format(product.margin_percentage or 0) }}%</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Fechas</h2>
+                <div class="info-row">
+                    <span class="info-label">Creado</span>
+                    <span class="info-value">{{ product.created_at.strftime('%d/%m/%Y %H:%M') if product.created_at else '-' }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Actualizado</span>
+                    <span class="info-value">{{ product.updated_at.strftime('%d/%m/%Y %H:%M') if product.updated_at else '-' }}</span>
+                </div>
+                {% if product.published_at %}
+                <div class="info-row">
+                    <span class="info-label">Publicado</span>
+                    <span class="info-value">{{ product.published_at.strftime('%d/%m/%Y %H:%M') }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if product.status in ['needs_approval', 'approved'] %}
+            <div class="card full-width">
+                <h2 class="card-title">Acciones</h2>
+                <div class="action-buttons">
+                    {% if product.status == 'needs_approval' %}
+                    <button class="btn btn-approve" onclick="approveProduct()">
+                        ✓ Aprobar producto
+                    </button>
+                    <button class="btn btn-reject" onclick="rejectProduct()">
+                        ✗ Rechazar producto
+                    </button>
+                    {% elif product.status == 'approved' %}
+                    <button class="btn btn-publish" onclick="publishProduct()">
+                        🚀 Publicar en Mercado Libre
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        const productId = {{ product.id }};
+
+        async function approveProduct() {
+            if (!confirm('¿Aprobar este producto?')) return;
+
+            try {
+                const response = await fetch(`/api/products/${productId}/approve`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    alert('✓ Producto aprobado');
+                    location.reload();
+                } else {
+                    alert('Error al aprobar el producto');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function rejectProduct() {
+            const reason = prompt('¿Por qué rechazas este producto?');
+            if (!reason) return;
+
+            try {
+                const response = await fetch(`/api/products/${productId}/reject?reason=${encodeURIComponent(reason)}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    alert('✓ Producto rechazado');
+                    window.location.href = '/dashboard/review-products';
+                } else {
+                    alert('Error al rechazar el producto');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function publishProduct() {
+            if (!confirm('¿Publicar este producto en Mercado Libre?')) return;
+
+            try {
+                const response = await fetch(`/api/products/${productId}/publish`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    alert(`✓ Producto publicado exitosamente\nML Item ID: ${data.ml_item_id}`);
+                    location.reload();
+                } else {
+                    alert('Error al publicar el producto');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
