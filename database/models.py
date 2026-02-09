@@ -86,7 +86,7 @@ class Listing(Base):
     # Relationships
     product = relationship("Product", back_populates="listings")
     metrics = relationship("ListingMetrics", back_populates="listing", cascade="all, delete-orphan")
-    ab_test = relationship("ABTest", back_populates="listings")
+    ab_test = relationship("ABTest", foreign_keys=[ab_test_id])
 
 
 class ProductMetrics(Base):
