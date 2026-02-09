@@ -5,11 +5,39 @@ from contextlib import asynccontextmanager
 import uvicorn
 import os
 
-# Crear aplicación FastAPI
+from database.db import init_db
+from routes import products, dashboard, actions
+from scheduler.jobs import job_scheduler
+from utils.logger import logger
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Startup and shutdown events"""
+    # Startup
+    logger.info("🚀 ML Automation System starting...")
+    
+    # Initialize database
+    init_db()
+    logger.info("✅ Database initialized")
+    
+    # Start scheduler
+    job_scheduler.start()
+    logger.info("✅ Job scheduler started")
+    
+    logger.info("✅ System ready!")
+    
+    yield
+    
+    # Shutdown
+    logger.info("👋 Shutting down ML Automation System...")
+    job_scheduler.shutdown()
+
+# Create app
 app = FastAPI(
     title="ML Automation System",
     description="Sistema de automatización para Mercado Libre",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # CORS
@@ -21,24 +49,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-async def startup_event():
-    """Inicialización al arrancar"""
-    print("🚀 Starting ML Automation System...")
-    print("✅ System ready!")
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Limpieza al apagar"""
-    print("👋 Shutting down ML Automation System...")
+# Routes
+app.include_router(products.router)
+app.include_router(dashboard.router)
+app.include_router(actions.router)
 
 @app.get("/")
 async def root():
-    """Endpoint raíz"""
+    """Root endpoint"""
     return {
         "message": "ML Automation System",
         "status": "running",
-        "docs": "/docs"
+        "docs": "/docs",
+        "dashboard": "/dashboard"
     }
 
 @app.get("/health")
