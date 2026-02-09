@@ -13,10 +13,16 @@ router = APIRouter(prefix="/api/products", tags=["products"])
 class ProductCreate(BaseModel):
     sku: str
     name: str
+    description: Optional[str] = None
     base_cost: float
+    shipping_cost: Optional[float] = 0
     stock: int = 0
     category: Optional[str] = None
+    listing_type: Optional[str] = "gold_special"
     images: Optional[List[str]] = []
+
+class TitleOptimizeRequest(BaseModel):
+    title: str
 
 class ProductResponse(BaseModel):
     id: int
@@ -45,6 +51,24 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db)):
     
     db.refresh(new_product)
     return new_product
+
+@router.post("/optimize-title")
+async def optimize_title(request: TitleOptimizeRequest, db: Session = Depends(get_db)):
+    """Optimize product title for Mercado Libre"""
+    manager = ProductManager(db)
+    optimized = await manager.optimize_title(request.title)
+    
+    if not optimized:
+        return {
+            "optimized_title": None,
+            "message": "Could not optimize title"
+        }
+    
+    return {
+        "original_title": request.title,
+        "optimized_title": optimized,
+        "message": "Title optimized successfully"
+    }
 
 @router.get("/", response_model=List[ProductResponse])
 def list_products(
@@ -161,9 +185,12 @@ async def bulk_upload(file: UploadFile = File(...), db: Session = Depends(get_db
             product_data = {
                 "sku": row["sku"],
                 "name": row["name"],
+                "description": row.get("description"),
                 "base_cost": float(row["base_cost"]),
+                "shipping_cost": float(row.get("shipping_cost", 0)),
                 "stock": int(row.get("stock", 0)),
                 "category": row.get("category"),
+                "listing_type": row.get("listing_type", "gold_special"),
                 "images": row.get("images", "").split("|") if row.get("images") else []
             }
             
