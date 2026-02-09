@@ -84,18 +84,3 @@ if __name__ == "__main__":
         reload=False,
         log_level="info"
     )
-```
-
----
-
-## ✅ Guárdalo y commitea
-
-Railway redeployará automáticamente.
-
----
-
-## ⏳ ESPERA 2 MIN
-
-Y prueba de nuevo:
-```
-https://web-production-b6de2.up.railway.app/dashboard
