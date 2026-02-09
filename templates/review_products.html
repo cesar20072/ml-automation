@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revisar Productos - ML Automation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #F8F9FA;
+            color: #1A1A1A;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            background: white;
+            padding: 30px 0;
+            border-bottom: 1px solid #E5E7EB;
+            margin-bottom: 40px;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2B5BA6;
+        }
+        
+        .btn-back {
+            padding: 10px 20px;
+            background: #E5E7EB;
+            color: #1A1A1A;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .btn-back:hover {
+            background: #D1D5DB;
+        }
+        
+        .product-card {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        
+        .product-image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            background: #F8F9FA;
+        }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-name {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .product-sku {
+            color: #6B7280;
+            margin-bottom: 16px;
+        }
+        
+        .product-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        
+        .detail-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+        
+        .score-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .score-high {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        
+        .score-medium {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .score-low {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+        
+        .recommendation {
+            background: #EFF6FF;
+            border-left: 4px solid #2B5BA6;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        
+        .recommendation-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1E40AF;
+        }
+        
+        .recommendation-text {
+            color: #1E40AF;
+            font-size: 14px;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-approve {
+            background: #00C896;
+            color: white;
+        }
+        
+        .btn-approve:hover {
+            background: #00a87a;
+        }
+        
+        .btn-reject {
+            background: #EF4444;
+            color: white;
+        }
+        
+        .btn-reject:hover {
+            background: #dc2626;
+        }
+        
+        .btn-detail {
+            background: #E5E7EB;
+            color: #1A1A1A;
+        }
+        
+        .btn-detail:hover {
+            background: #D1D5DB;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 16px;
+        }
+        
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        
+        .empty-text {
+            color: #6B7280;
+            font-size: 18px;
+        }
+        
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        
+        .filter-label {
+            font-weight: 600;
+        }
+        
+        .filter-select {
+            padding: 8px 16px;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>✅ Revisar Productos</h1>
+            <a href="/dashboard/" class="btn-back">← Volver al Dashboard</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="filters">
+            <span class="filter-label">Filtrar por:</span>
+            <select class="filter-select" onchange="filterProducts(this.value)">
+                <option value="all">Todos los productos</option>
+                <option value="needs_approval" selected>Necesitan aprobación</option>
+                <option value="approved">Aprobados</option>
+                <option value="pending">Pendientes</option>
+                <option value="rejected">Rechazados</option>
+            </select>
+        </div>
+
+        {% if products %}
+            {% for product in products %}
+            <div class="product-card">
+                <img src="{{ product.images[0] if product.images else 'https://via.placeholder.com/200' }}" 
+                     alt="{{ product.name }}" 
+                     class="product-image">
+                
+                <div class="product-info">
+                    <h2 class="product-name">{{ product.name }}</h2>
+                    <p class="product-sku">SKU: {{ product.sku }}</p>
+                    
+                    <div class="product-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Score</span>
+                            <span class="detail-value">
+                                <span class="score-badge {% if product.score >= 80 %}score-high{% elif product.score >= 50 %}score-medium{% else %}score-low{% endif %}">
+                                    {{ product.score }}/100
+                                </span>
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Precio calculado</span>
+                            <span class="detail-value">${{ "%.2f"|format(product.final_price or 0) }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Margen</span>
+                            <span class="detail-value">{{ "%.2f"|format(product.margin_percentage or 0) }}%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Stock</span>
+                            <span class="detail-value">{{ product.stock }} unidades</span>
+                        </div>
+                    </div>
+                    
+                    <div class="recommendation">
+                        <div class="recommendation-title">💡 Recomendación del sistema</div>
+                        <div class="recommendation-text">
+                            {% if product.score >= 80 %}
+                                Este producto tiene un score excelente. Se recomienda aprobar y publicar automáticamente.
+                            {% elif product.score >= 50 %}
+                                Este producto tiene un score aceptable pero necesita revisión manual antes de publicar.
+                            {% else %}
+                                Este producto tiene un score bajo. Se recomienda rechazar o ajustar el precio base.
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="product-actions">
+                        <button class="btn btn-approve" onclick="approveProduct({{ product.id }})">
+                            ✓ Aprobar y publicar
+                        </button>
+                        <button class="btn btn-reject" onclick="rejectProduct({{ product.id }})">
+                            ✗ Rechazar
+                        </button>
+                        <button class="btn btn-detail" onclick="window.location.href='/dashboard/product/{{ product.id }}'">
+                            Ver detalle completo
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">✅</div>
+                <p class="empty-text">No hay productos para revisar</p>
+                <p style="margin-top: 12px; color: #6B7280;">Todos los productos han sido procesados</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        async function approveProduct(productId) {
+            if (!confirm('¿Aprobar este producto? Se publicará automáticamente en Mercado Libre.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/products/${productId}/approve`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    alert('✓ Producto aprobado. Se publicará automáticamente.');
+                    location.reload();
+                } else {
+                    alert('Error al aprobar el producto');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function rejectProduct(productId) {
+            const reason = prompt('¿Por qué rechazas este producto? (opcional)');
+            
+            try {
+                const response = await fetch(`/api/products/${productId}/reject?reason=${encodeURIComponent(reason || 'Sin razón')}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    alert('✓ Producto rechazado');
+                    location.reload();
+                } else {
+                    alert('Error al rechazar el producto');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function filterProducts(status) {
+            const url = status === 'all' ? '/dashboard/review-products' : `/dashboard/review-products?status=${status}`;
+            window.location.href = url;
+        }
+    </script>
+</body>
+</html>
