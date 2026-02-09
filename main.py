@@ -54,10 +54,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Routes
+# Include routers
 app.include_router(products.router)
 app.include_router(dashboard.router)
 app.include_router(actions.router)
+
+# Import and include sync router
+from routes import sync
+app.include_router(sync.router)
 
 @app.get("/")
 async def root():
