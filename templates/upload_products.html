@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Productos - ML Automation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #F8F9FA;
+            color: #1A1A1A;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            background: white;
+            padding: 30px 0;
+            border-bottom: 1px solid #E5E7EB;
+            margin-bottom: 40px;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2B5BA6;
+        }
+        
+        .btn-back {
+            padding: 10px 20px;
+            background: #E5E7EB;
+            color: #1A1A1A;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .btn-back:hover {
+            background: #D1D5DB;
+        }
+        
+        .upload-section {
+            background: white;
+            padding: 60px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .upload-icon {
+            font-size: 80px;
+            margin-bottom: 24px;
+        }
+        
+        .upload-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .upload-description {
+            color: #6B7280;
+            margin-bottom: 32px;
+            font-size: 16px;
+        }
+        
+        .drop-zone {
+            border: 3px dashed #D1D5DB;
+            border-radius: 12px;
+            padding: 60px;
+            margin-bottom: 24px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .drop-zone:hover {
+            border-color: #2B5BA6;
+            background: #F8F9FA;
+        }
+        
+        .drop-zone.active {
+            border-color: #2B5BA6;
+            background: #EFF6FF;
+        }
+        
+        .drop-zone-text {
+            font-size: 18px;
+            color: #6B7280;
+            margin-bottom: 16px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: #2B5BA6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #234a8a;
+        }
+        
+        .btn-success {
+            background: #00C896;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #00a87a;
+        }
+        
+        .info-box {
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .info-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1E40AF;
+        }
+        
+        .info-list {
+            list-style: none;
+            color: #1E40AF;
+        }
+        
+        .info-list li {
+            padding: 6px 0;
+            padding-left: 24px;
+            position: relative;
+        }
+        
+        .info-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        .example-section {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .example-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .csv-example {
+            background: #F8F9FA;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        
+        .btn-download {
+            margin-top: 16px;
+            background: #E5E7EB;
+            color: #1A1A1A;
+        }
+        
+        .btn-download:hover {
+            background: #D1D5DB;
+        }
+        
+        .preview-section {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-top: 24px;
+            display: none;
+        }
+        
+        .preview-section.active {
+            display: block;
+        }
+        
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .preview-table th,
+        .preview-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .preview-table th {
+            background: #F8F9FA;
+            font-weight: 600;
+        }
+        
+        .action-buttons {
+            margin-top: 24px;
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>📤 Subir Productos</h1>
+            <a href="/dashboard/" class="btn-back">← Volver al Dashboard</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="info-box">
+            <div class="info-title">📋 Formato del archivo CSV</div>
+            <ul class="info-list">
+                <li>El archivo debe contener las columnas: sku, name, base_cost, stock, category, images</li>
+                <li>Las imágenes deben estar separadas por | (pipe)</li>
+                <li>Los precios se calcularán automáticamente</li>
+                <li>El sistema asignará un score a cada producto</li>
+                <li>Productos con score ≥ 80 se publicarán automáticamente</li>
+            </ul>
+        </div>
+
+        <div class="upload-section">
+            <div class="upload-icon">📂</div>
+            <h2 class="upload-title">Arrastra tu archivo CSV aquí</h2>
+            <p class="upload-description">o haz clic para seleccionar un archivo</p>
+            
+            <form id="uploadForm" action="/api/products/bulk-upload" method="POST" enctype="multipart/form-data">
+                <div class="drop-zone" id="dropZone">
+                    <p class="drop-zone-text">Suelta el archivo aquí</p>
+                    <button type="button" class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                        Seleccionar archivo
+                    </button>
+                    <input type="file" id="fileInput" name="file" accept=".csv" class="file-input">
+                </div>
+                
+                <div id="fileName" style="margin-top: 16px; color: #6B7280;"></div>
+            </form>
+        </div>
+
+        <div class="preview-section" id="previewSection">
+            <h3 class="example-title">Vista previa de productos</h3>
+            <div id="previewContent"></div>
+            <div class="action-buttons">
+                <button class="btn btn-success" onclick="uploadProducts()">✓ Subir productos</button>
+                <button class="btn btn-back" onclick="cancelUpload()">✗ Cancelar</button>
+            </div>
+        </div>
+
+        <div class="example-section">
+            <h3 class="example-title">Ejemplo de formato CSV</h3>
+            <div class="csv-example">sku,name,base_cost,stock,category,images
+PROD-001,Audífonos Bluetooth Premium,150,100,Electrónica,https://example.com/img1.jpg|https://example.com/img2.jpg
+PROD-002,Mouse Inalámbrico,80,200,Electrónica,https://example.com/mouse.jpg
+PROD-003,Teclado Mecánico RGB,250,50,Electrónica,https://example.com/keyboard.jpg</div>
+            <button class="btn btn-download" onclick="downloadTemplate()">📥 Descargar plantilla CSV</button>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const previewSection = document.getElementById('previewSection');
+        let selectedFile = null;
+
+        // Drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('active');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('active');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('active');
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.name.endsWith('.csv')) {
+                alert('Por favor selecciona un archivo CSV');
+                return;
+            }
+            
+            selectedFile = file;
+            fileName.textContent = `Archivo seleccionado: ${file.name}`;
+            
+            // Parse CSV preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const text = e.target.result;
+                showPreview(text);
+            };
+            reader.readAsText(file);
+        }
+
+        function showPreview(csvText) {
+            const lines = csvText.split('\n').filter(line => line.trim());
+            const headers = lines[0].split(',');
+            const rows = lines.slice(1, 6); // Show first 5 products
+            
+            let html = `<p style="color: #6B7280; margin-bottom: 16px;">Mostrando los primeros 5 productos de ${lines.length - 1} total</p>`;
+            html += '<table class="preview-table"><thead><tr>';
+            
+            headers.forEach(header => {
+                html += `<th>${header}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            rows.forEach(row => {
+                const cols = row.split(',');
+                html += '<tr>';
+                cols.forEach(col => {
+                    html += `<td>${col}</td>`;
+                });
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            
+            document.getElementById('previewContent').innerHTML = html;
+            previewSection.classList.add('active');
+        }
+
+        async function uploadProducts() {
+            if (!selectedFile) {
+                alert('No hay archivo seleccionado');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('/api/products/bulk-upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(`✓ ${result.created} productos creados exitosamente`);
+                    window.location.href = '/dashboard/';
+                } else {
+                    alert('Error al subir productos');
+                }
+            } catch (error) {
+                alert('Error al subir productos: ' + error.message);
+            }
+        }
+
+        function cancelUpload() {
+            selectedFile = null;
+            fileName.textContent = '';
+            fileInput.value = '';
+            previewSection.classList.remove('active');
+        }
+
+        function downloadTemplate() {
+            const csv = `sku,name,base_cost,stock,category,images
+PROD-001,Producto Ejemplo 1,100,50,Categoría,https://example.com/img1.jpg
+PROD-002,Producto Ejemplo 2,150,30,Categoría,https://example.com/img2.jpg`;
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'plantilla_productos.csv';
+            a.click();
+        }
+    </script>
+</body>
+</html>
