@@ -2,16 +2,19 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from pathlib import Path
 from database.db import get_db
 from database.models import Product, ActionLog
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
-templates = Jinja2Templates(directory="templates")
+
+# Templates
+TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 @router.get("/", response_class=HTMLResponse)
 def dashboard_home(request: Request, db: Session = Depends(get_db)):
-    """Main dashboard"""
+    """Main dashboard - ORVIA style"""
     
     # Stats
     total_products = db.query(Product).count()
@@ -22,10 +25,7 @@ def dashboard_home(request: Request, db: Session = Depends(get_db)):
     # Recent products
     recent_products = db.query(Product).order_by(Product.created_at.desc()).limit(10).all()
     
-    # Recent actions
-    recent_actions = db.query(ActionLog).order_by(ActionLog.created_at.desc()).limit(10).all()
-    
-    return templates.TemplateResponse("dashboard.html", {
+    return templates.TemplateResponse("dashboard_home.html", {
         "request": request,
         "stats": {
             "total": total_products,
@@ -33,8 +33,48 @@ def dashboard_home(request: Request, db: Session = Depends(get_db)):
             "pending": pending,
             "needs_approval": needs_approval
         },
-        "recent_products": recent_products,
-        "recent_actions": recent_actions
+        "recent_products": recent_products
+    })
+
+@router.get("/upload-products", response_class=HTMLResponse)
+def upload_products_page(request: Request):
+    """Upload products page"""
+    return templates.TemplateResponse("upload_products.html", {
+        "request": request
+    })
+
+@router.get("/review-products", response_class=HTMLResponse)
+def review_products_page(request: Request, status: str = "needs_approval", db: Session = Depends(get_db)):
+    """Review and approve products page"""
+    
+    query = db.query(Product)
+    
+    if status != "all":
+        query = query.filter(Product.status == status)
+    
+    products = query.order_by(Product.created_at.desc()).all()
+    
+    return templates.TemplateResponse("review_products.html", {
+        "request": request,
+        "products": products,
+        "filter_status": status
+    })
+
+@router.get("/product/{product_id}", response_class=HTMLResponse)
+def product_detail_page(request: Request, product_id: int, db: Session = Depends(get_db)):
+    """Product detail page"""
+    
+    product = db.query(Product).filter(Product.id == product_id).first()
+    
+    if not product:
+        return templates.TemplateResponse("error.html", {
+            "request": request,
+            "message": "Producto no encontrado"
+        })
+    
+    return templates.TemplateResponse("product_detail.html", {
+        "request": request,
+        "product": product
     })
 
 @router.get("/products", response_class=HTMLResponse)
