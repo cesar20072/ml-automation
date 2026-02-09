@@ -31,6 +31,15 @@
             margin-bottom: 40px;
         }
         
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
         h1 {
             font-size: 32px;
             font-weight: 600;
@@ -41,6 +50,41 @@
         .subtitle {
             color: #6B7280;
             font-size: 16px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn-sync {
+            padding: 10px 20px;
+            background: #00C896;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-sync:hover {
+            background: #00a87a;
+        }
+        
+        .btn-import {
+            padding: 10px 20px;
+            background: #2B5BA6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-import:hover {
+            background: #234a8a;
         }
         
         .stats-grid {
@@ -89,7 +133,7 @@
         
         .action-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 24px;
         }
         
@@ -223,6 +267,11 @@
             color: #991B1B;
         }
         
+        .status-published {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+        
         .product-price {
             font-size: 18px;
             font-weight: 700;
@@ -274,13 +323,57 @@
             color: #92400E;
             font-size: 14px;
         }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-content {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        
+        .loading-spinner {
+            font-size: 48px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <header>
-        <div class="container">
-            <h1>🚀 ML Automation</h1>
-            <p class="subtitle">Sistema de automatización para Mercado Libre</p>
+        <div class="header-content">
+            <div>
+                <h1>🚀 ML Automation</h1>
+                <p class="subtitle">Sistema de automatización para Mercado Libre</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-import" onclick="importFromML()">
+                    📥 Importar de ML
+                </button>
+                <button class="btn-sync" onclick="syncToShopify()">
+                    🔄 Sincronizar Shopify
+                </button>
+            </div>
         </div>
     </header>
 
@@ -321,10 +414,19 @@
             <h2 class="section-title">¿Qué quieres hacer?</h2>
             <div class="action-cards">
                 <div class="action-card">
-                    <div class="action-icon">📤</div>
-                    <div class="action-title">Subir Productos</div>
+                    <div class="action-icon">➕</div>
+                    <div class="action-title">Crear Producto</div>
                     <div class="action-description">
-                        Carga múltiples productos desde un archivo CSV. El sistema calculará precios y márgenes automáticamente.
+                        Crea un producto nuevo con un formulario simple. El sistema calculará precios y márgenes automáticamente.
+                    </div>
+                    <a href="/dashboard/create-product" class="btn btn-primary">Crear producto</a>
+                </div>
+
+                <div class="action-card">
+                    <div class="action-icon">📤</div>
+                    <div class="action-title">Subir CSV</div>
+                    <div class="action-description">
+                        Carga múltiples productos desde un archivo CSV para procesar en lote.
                     </div>
                     <a href="/dashboard/upload-products" class="btn btn-primary">Subir archivo CSV</a>
                 </div>
@@ -342,7 +444,7 @@
                     <div class="action-icon">📊</div>
                     <div class="action-title">Ver Reportes</div>
                     <div class="action-description">
-                        Consulta estadísticas de ventas, márgenes y rendimiento de tus productos en Mercado Libre.
+                        Consulta estadísticas de ventas, márgenes y rendimiento de tus productos.
                     </div>
                     <a href="/dashboard/analytics" class="btn btn-secondary">Ver reportes</a>
                 </div>
@@ -377,10 +479,75 @@
                 <div class="empty-state">
                     <div class="empty-icon">📦</div>
                     <p>No tienes productos todavía</p>
-                    <p style="margin-top: 8px;"><a href="/dashboard/upload-products" style="color: #2B5BA6;">Sube tu primer producto</a></p>
+                    <p style="margin-top: 8px;"><a href="/dashboard/create-product" style="color: #2B5BA6;">Crea tu primer producto</a></p>
                 </div>
             {% endif %}
         </div>
     </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner">⏳</div>
+            <p style="margin-top: 16px; font-weight: 600;" id="loadingText">Procesando...</p>
+        </div>
+    </div>
+
+    <script>
+        async function importFromML() {
+            if (!confirm('¿Importar todos los productos desde Mercado Libre? Esto puede tardar unos minutos.')) {
+                return;
+            }
+
+            document.getElementById('loadingText').textContent = 'Importando productos de Mercado Libre...';
+            document.getElementById('loadingOverlay').classList.add('active');
+
+            try {
+                const response = await fetch('/api/sync/import-from-ml', {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(`✓ Importación completada:\n${result.imported} productos importados\n${result.updated} productos actualizados`);
+                    location.reload();
+                } else {
+                    alert('Error al importar productos');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                document.getElementById('loadingOverlay').classList.remove('active');
+            }
+        }
+
+        async function syncToShopify() {
+            if (!confirm('¿Sincronizar todos los productos publicados con Shopify?')) {
+                return;
+            }
+
+            document.getElementById('loadingText').textContent = 'Sincronizando con Shopify...';
+            document.getElementById('loadingOverlay').classList.add('active');
+
+            try {
+                const response = await fetch('/api/sync/sync-to-shopify', {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(`✓ Sincronización completada:\n${result.synced} de ${result.total} productos sincronizados`);
+                    location.reload();
+                } else {
+                    alert('Error al sincronizar con Shopify');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                document.getElementById('loadingOverlay').classList.remove('active');
+            }
+        }
+    </script>
 </body>
 </html>
