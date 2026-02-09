@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Producto - ML Automation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #F8F9FA;
+            color: #1A1A1A;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            background: white;
+            padding: 30px 0;
+            border-bottom: 1px solid #E5E7EB;
+            margin-bottom: 40px;
+        }
+        
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2B5BA6;
+        }
+        
+        .btn-back {
+            padding: 10px 20px;
+            background: #E5E7EB;
+            color: #1A1A1A;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .btn-back:hover {
+            background: #D1D5DB;
+        }
+        
+        .form-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1A1A1A;
+        }
+        
+        .form-label span {
+            color: #EF4444;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #2B5BA6;
+        }
+        
+        .form-input:disabled {
+            background: #F8F9FA;
+            color: #6B7280;
+        }
+        
+        .form-help {
+            font-size: 14px;
+            color: #6B7280;
+            margin-top: 4px;
+        }
+        
+        .btn {
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #2B5BA6;
+            color: white;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            background: #234a8a;
+        }
+        
+        .btn-primary:disabled {
+            background: #D1D5DB;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #6B7280;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .success-message {
+            background: #D1FAE5;
+            border-left: 4px solid #00C896;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: none;
+        }
+        
+        .success-message.active {
+            display: block;
+        }
+        
+        .error-message {
+            background: #FEE2E2;
+            border-left: 4px solid #EF4444;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: none;
+        }
+        
+        .error-message.active {
+            display: block;
+        }
+        
+        .preview-section {
+            background: #F8F9FA;
+            padding: 24px;
+            border-radius: 12px;
+            margin-top: 24px;
+            display: none;
+        }
+        
+        .preview-section.active {
+            display: block;
+        }
+        
+        .preview-title {
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1A1A1A;
+        }
+        
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+        
+        .preview-label {
+            color: #6B7280;
+        }
+        
+        .preview-value {
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>📝 Crear Producto</h1>
+            <a href="/dashboard/" class="btn-back">← Volver al Dashboard</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="success-message" id="successMessage">
+            ✓ Producto creado exitosamente con score: <span id="productScore"></span>
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            ✗ Error al crear el producto. Por favor intenta de nuevo.
+        </div>
+
+        <div class="form-card">
+            <form id="productForm">
+                <div class="form-group">
+                    <label class="form-label">SKU <span>*</span></label>
+                    <input type="text" class="form-input" id="sku" name="sku" required placeholder="Ej: PROD-001">
+                    <div class="form-help">Código único del producto</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nombre del Producto <span>*</span></label>
+                    <input type="text" class="form-input" id="name" name="name" required placeholder="Ej: Audífonos Bluetooth Premium">
+                    <div class="form-help">Máximo 60 caracteres para Mercado Libre</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Costo Base (MXN) <span>*</span></label>
+                    <input type="number" class="form-input" id="base_cost" name="base_cost" required step="0.01" min="0" placeholder="Ej: 150.00">
+                    <div class="form-help">Precio de costo sin IVA</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Stock Disponible <span>*</span></label>
+                    <input type="number" class="form-input" id="stock" name="stock" required min="0" value="0" placeholder="Ej: 100">
+                    <div class="form-help">Cantidad de unidades disponibles</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Categoría</label>
+                    <input type="text" class="form-input" id="category" name="category" placeholder="Ej: Electrónica">
+                    <div class="form-help">Categoría del producto (opcional)</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">URL de Imagen</label>
+                    <input type="url" class="form-input" id="images" name="images" placeholder="https://ejemplo.com/imagen.jpg">
+                    <div class="form-help">URL de la imagen principal (opcional)</div>
+                </div>
+
+                <div class="preview-section" id="previewSection">
+                    <div class="preview-title">Vista Previa del Cálculo</div>
+                    <div class="preview-item">
+                        <span class="preview-label">Costo base:</span>
+                        <span class="preview-value" id="previewCost">$0.00</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Precio estimado:</span>
+                        <span class="preview-value" id="previewPrice">$0.00</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Margen estimado:</span>
+                        <span class="preview-value" id="previewMargin">0%</span>
+                    </div>
+                </div>
+
+                <div class="loading" id="loading">
+                    ⏳ Creando producto y calculando precios...
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    Crear Producto
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('productForm');
+        const baseCostInput = document.getElementById('base_cost');
+        const previewSection = document.getElementById('previewSection');
+        const loading = document.getElementById('loading');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Update preview when cost changes
+        baseCostInput.addEventListener('input', function() {
+            const cost = parseFloat(this.value) || 0;
+            
+            if (cost > 0) {
+                // Estimate price (simplified calculation)
+                const estimatedPrice = cost * 2.37; // ~40% margin after costs
+                const estimatedMargin = 35;
+                
+                document.getElementById('previewCost').textContent = `$${cost.toFixed(2)}`;
+                document.getElementById('previewPrice').textContent = `$${estimatedPrice.toFixed(2)}`;
+                document.getElementById('previewMargin').textContent = `~${estimatedMargin}%`;
+                
+                previewSection.classList.add('active');
+            } else {
+                previewSection.classList.remove('active');
+            }
+        });
+
+        // Handle form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Hide messages
+            successMessage.classList.remove('active');
+            errorMessage.classList.remove('active');
+            
+            // Show loading
+            loading.classList.add('active');
+            submitBtn.disabled = true;
+            
+            // Get form data
+            const formData = {
+                sku: document.getElementById('sku').value,
+                name: document.getElementById('name').value,
+                base_cost: parseFloat(document.getElementById('base_cost').value),
+                stock: parseInt(document.getElementById('stock').value),
+                category: document.getElementById('category').value || null,
+                images: document.getElementById('images').value ? [document.getElementById('images').value] : []
+            };
+            
+            try {
+                const response = await fetch('/api/products/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Show success
+                    document.getElementById('productScore').textContent = result.score + '/100';
+                    successMessage.classList.add('active');
+                    
+                    // Reset form
+                    form.reset();
+                    previewSection.classList.remove('active');
+                    
+                    // Redirect after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/dashboard/review-products';
+                    }, 2000);
+                } else {
+                    throw new Error(result.detail || 'Error al crear producto');
+                }
+            } catch (error) {
+                errorMessage.textContent = '✗ ' + error.message;
+                errorMessage.classList.add('active');
+            } finally {
+                loading.classList.remove('active');
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
