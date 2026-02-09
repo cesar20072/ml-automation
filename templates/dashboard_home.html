@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Automation - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #F8F9FA;
+            color: #1A1A1A;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            background: white;
+            padding: 30px 0;
+            border-bottom: 1px solid #E5E7EB;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #2B5BA6;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #6B7280;
+            font-size: 16px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: #2B5BA6;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            color: #6B7280;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .actions-section {
+            margin-bottom: 50px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 24px;
+        }
+        
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        
+        .action-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .action-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .action-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 12px;
+        }
+        
+        .action-description {
+            color: #6B7280;
+            font-size: 15px;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: #2B5BA6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #234a8a;
+        }
+        
+        .btn-success {
+            background: #00C896;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #00a87a;
+        }
+        
+        .btn-secondary {
+            background: #E5E7EB;
+            color: #1A1A1A;
+        }
+        
+        .btn-secondary:hover {
+            background: #D1D5DB;
+        }
+        
+        .recent-products {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+        
+        .product-sku {
+            font-size: 14px;
+            color: #6B7280;
+        }
+        
+        .product-status {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 0 16px;
+        }
+        
+        .status-pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .status-approved {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        
+        .status-needs_approval {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+        
+        .product-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2B5BA6;
+            min-width: 100px;
+            text-align: right;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6B7280;
+        }
+        
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        
+        .alert {
+            background: #FEF3C7;
+            border-left: 4px solid #F59E0B;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .alert-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .alert-icon {
+            font-size: 32px;
+        }
+        
+        .alert-text {
+            flex: 1;
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .alert-message {
+            color: #92400E;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🚀 ML Automation</h1>
+            <p class="subtitle">Sistema de automatización para Mercado Libre</p>
+        </div>
+    </header>
+
+    <div class="container">
+        {% if stats.needs_approval > 0 %}
+        <div class="alert">
+            <div class="alert-content">
+                <div class="alert-icon">⚠️</div>
+                <div class="alert-text">
+                    <div class="alert-title">Tienes {{ stats.needs_approval }} producto(s) esperando tu aprobación</div>
+                    <div class="alert-message">Revisa los productos para aprobarlos o rechazarlos</div>
+                </div>
+                <a href="/dashboard/review-products" class="btn btn-primary">Revisar ahora</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total }}</div>
+                <div class="stat-label">Total de Productos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.published }}</div>
+                <div class="stat-label">Publicados en ML</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.pending }}</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.needs_approval }}</div>
+                <div class="stat-label">Necesitan Aprobación</div>
+            </div>
+        </div>
+
+        <div class="actions-section">
+            <h2 class="section-title">¿Qué quieres hacer?</h2>
+            <div class="action-cards">
+                <div class="action-card">
+                    <div class="action-icon">📤</div>
+                    <div class="action-title">Subir Productos</div>
+                    <div class="action-description">
+                        Carga múltiples productos desde un archivo CSV. El sistema calculará precios y márgenes automáticamente.
+                    </div>
+                    <a href="/dashboard/upload-products" class="btn btn-primary">Subir archivo CSV</a>
+                </div>
+
+                <div class="action-card">
+                    <div class="action-icon">✅</div>
+                    <div class="action-title">Revisar Productos</div>
+                    <div class="action-description">
+                        Aprueba o rechaza productos según su score. Los productos aprobados se publicarán automáticamente.
+                    </div>
+                    <a href="/dashboard/review-products" class="btn btn-success">Ver productos ({{ stats.needs_approval }})</a>
+                </div>
+
+                <div class="action-card">
+                    <div class="action-icon">📊</div>
+                    <div class="action-title">Ver Reportes</div>
+                    <div class="action-description">
+                        Consulta estadísticas de ventas, márgenes y rendimiento de tus productos en Mercado Libre.
+                    </div>
+                    <a href="/dashboard/analytics" class="btn btn-secondary">Ver reportes</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="recent-products">
+            <h2 class="section-title">Productos Recientes</h2>
+            {% if recent_products %}
+                {% for product in recent_products %}
+                <div class="product-item">
+                    <div class="product-info">
+                        <div class="product-name">{{ product.name }}</div>
+                        <div class="product-sku">SKU: {{ product.sku }}</div>
+                    </div>
+                    <span class="product-status status-{{ product.status }}">
+                        {% if product.status == 'needs_approval' %}
+                            Necesita aprobación
+                        {% elif product.status == 'approved' %}
+                            Aprobado
+                        {% elif product.status == 'published' %}
+                            Publicado
+                        {% else %}
+                            {{ product.status }}
+                        {% endif %}
+                    </span>
+                    <div class="product-price">${{ "%.2f"|format(product.final_price or 0) }}</div>
+                    <a href="/dashboard/product/{{ product.id }}" class="btn btn-secondary">Ver detalle</a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <p>No tienes productos todavía</p>
+                    <p style="margin-top: 8px;"><a href="/dashboard/upload-products" style="color: #2B5BA6;">Sube tu primer producto</a></p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
