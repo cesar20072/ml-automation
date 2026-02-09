@@ -26,11 +26,17 @@ class ProductManager:
                 logger.warning(f"Product already exists: {product_data['sku']}")
                 return existing
             
+            # Extract additional fields
+            description = product_data.pop('description', None)
+            listing_type = product_data.pop('listing_type', 'gold_special')
+            shipping_cost = product_data.get('shipping_cost', 0)
+            
             # Create product
             product = Product(
                 sku=product_data["sku"],
                 name=product_data["name"],
                 base_cost=product_data["base_cost"],
+                shipping_cost=shipping_cost,
                 stock=product_data.get("stock", 0),
                 category=product_data.get("category"),
                 images=product_data.get("images", []),
@@ -77,7 +83,10 @@ class ProductManager:
             product.final_price = pricing["competitive_price"]
             product.margin_percentage = pricing["margin_percentage"]
             product.ml_commission_percentage = pricing["commission_percentage"]
-            product.shipping_cost = pricing["shipping_cost"]
+            
+            # Keep user-provided shipping cost if set
+            if not product.shipping_cost:
+                product.shipping_cost = pricing["shipping_cost"]
             
             # Calculate score
             score_data = calculate_product_score(product, pricing)
@@ -102,6 +111,53 @@ class ProductManager:
             logger.error(f"Error calculating and scoring: {str(e)}")
             self.db.rollback()
             return False
+    
+    async def optimize_title(self, basic_title: str) -> Optional[str]:
+        """
+        Optimize product title for Mercado Libre using ML search
+        Returns optimized title with popular keywords
+        """
+        try:
+            # Search similar products on ML
+            search_results = await ml_api.search(basic_title, limit=10)
+            
+            if not search_results or 'results' not in search_results:
+                logger.warning(f"No search results for title optimization: {basic_title}")
+                return None
+            
+            # Extract common keywords from top results
+            keywords = set()
+            for item in search_results['results'][:5]:
+                title = item.get('title', '')
+                # Extract words (longer than 3 chars, excluding common words)
+                words = [
+                    w for w in title.split() 
+                    if len(w) > 3 and w.lower() not in [
+                        'para', 'con', 'sin', 'por', 'los', 'las', 'del', 'una', 'uno'
+                    ]
+                ]
+                keywords.update(words[:10])
+            
+            # Build optimized title
+            # Start with basic title capitalized
+            optimized = basic_title.strip().title()
+            
+            # Add relevant keywords (max 60 chars for ML)
+            popular_keywords = list(keywords)[:5]
+            for keyword in popular_keywords:
+                if keyword.lower() not in optimized.lower():
+                    test_title = f"{optimized} {keyword.title()}"
+                    if len(test_title) <= 60:
+                        optimized = test_title
+                    else:
+                        break
+            
+            logger.info(f"Title optimized: '{basic_title}' -> '{optimized}'")
+            return optimized
+            
+        except Exception as e:
+            logger.error(f"Error optimizing title: {str(e)}")
+            return None
     
     async def publish_to_ml(self, product_id: int) -> Optional[str]:
         """Publish product to Mercado Libre"""
