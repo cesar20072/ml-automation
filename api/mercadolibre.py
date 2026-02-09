@@ -49,13 +49,20 @@ class MercadoLibreAPI:
             return False
     
     async def search_items(self, query: str, limit: int = 20) -> List[Dict]:
-        """Search items in ML"""
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(
-                    f"{self.base_url}/sites/{self.country}/search",
-                    params={"q": query, "limit": limit}
-                )
+    """Search items in ML - Public search without authentication"""
+    try:
+        headers = {
+            "User-Agent": "ML-Automation/1.0",
+            "Accept": "application/json"
+        }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.base_url}/sites/{self.country}/search",
+                params={"q": query, "limit": limit},
+                headers=headers,
+                timeout=10.0
+            )
                 
                 if response.status_code == 200:
                     return response.json().get("results", [])
