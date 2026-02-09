@@ -182,9 +182,6 @@ class ABTest(Base):
     started_at = Column(DateTime, default=datetime.utcnow)
     ended_at = Column(DateTime, nullable=True)
     
-    # Relationships
-    listings = relationship("Listing", back_populates="ab_test", foreign_keys=[Listing.ab_test_id])
-
 
 class ActionLog(Base):
     __tablename__ = "action_logs"
