@@ -1,14 +1,19 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.templating import Jinja2Templates
 from contextlib import asynccontextmanager
 import uvicorn
 import os
+from pathlib import Path
 
 from database.db import init_db
 from routes import products, dashboard, actions
 from scheduler.jobs import job_scheduler
 from utils.logger import logger
+
+# Templates directory
+TEMPLATES_DIR = Path(__file__).parent / "templates"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -79,3 +84,18 @@ if __name__ == "__main__":
         reload=False,
         log_level="info"
     )
+```
+
+---
+
+## ✅ Guárdalo y commitea
+
+Railway redeployará automáticamente.
+
+---
+
+## ⏳ ESPERA 2 MIN
+
+Y prueba de nuevo:
+```
+https://web-production-b6de2.up.railway.app/dashboard
