@@ -36,6 +36,13 @@ def dashboard_home(request: Request, db: Session = Depends(get_db)):
         "recent_products": recent_products
     })
 
+@router.get("/create-product", response_class=HTMLResponse)
+def create_product_page(request: Request):
+    """Create product form page"""
+    return templates.TemplateResponse("create_product.html", {
+        "request": request
+    })
+
 @router.get("/upload-products", response_class=HTMLResponse)
 def upload_products_page(request: Request):
     """Upload products page"""
