@@ -19,7 +19,7 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 40px 20px;
         }
@@ -32,7 +32,7 @@
         }
         
         .header-content {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 0 20px;
             display: flex;
@@ -67,6 +67,25 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         
+        .form-section {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 20px;
+        }
+        
         .form-group {
             margin-bottom: 24px;
         }
@@ -82,29 +101,110 @@
             color: #EF4444;
         }
         
-        .form-input {
+        .form-input,
+        .form-textarea,
+        .form-select {
             width: 100%;
             padding: 12px 16px;
             border: 2px solid #E5E7EB;
             border-radius: 8px;
             font-size: 16px;
             transition: border-color 0.2s;
+            font-family: inherit;
         }
         
-        .form-input:focus {
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
             outline: none;
             border-color: #2B5BA6;
-        }
-        
-        .form-input:disabled {
-            background: #F8F9FA;
-            color: #6B7280;
         }
         
         .form-help {
             font-size: 14px;
             color: #6B7280;
             margin-top: 4px;
+        }
+        
+        .input-with-button {
+            display: flex;
+            gap: 12px;
+            align-items: start;
+        }
+        
+        .input-with-button .form-input {
+            flex: 1;
+        }
+        
+        .btn-optimize {
+            padding: 12px 24px;
+            background: #00C896;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        
+        .btn-optimize:hover {
+            background: #00a87a;
+        }
+        
+        .btn-optimize:disabled {
+            background: #D1D5DB;
+            cursor: not-allowed;
+        }
+        
+        .suggestion-box {
+            background: #EFF6FF;
+            border: 2px solid #2B5BA6;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+            display: none;
+        }
+        
+        .suggestion-box.active {
+            display: block;
+        }
+        
+        .suggestion-title {
+            font-weight: 600;
+            color: #1E40AF;
+            margin-bottom: 8px;
+        }
+        
+        .suggestion-text {
+            color: #1E40AF;
+            margin-bottom: 12px;
+        }
+        
+        .btn-use-suggestion {
+            padding: 8px 16px;
+            background: #2B5BA6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-use-suggestion:hover {
+            background: #234a8a;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
         }
         
         .btn {
@@ -227,47 +327,102 @@
 
         <div class="form-card">
             <form id="productForm">
-                <div class="form-group">
-                    <label class="form-label">SKU <span>*</span></label>
-                    <input type="text" class="form-input" id="sku" name="sku" required placeholder="Ej: PROD-001">
-                    <div class="form-help">Código único del producto</div>
+                <!-- Información Básica -->
+                <div class="form-section">
+                    <h3 class="section-title">📦 Información Básica</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">SKU <span>*</span></label>
+                        <input type="text" class="form-input" id="sku" name="sku" required placeholder="Ej: PROD-001">
+                        <div class="form-help">Código único del producto</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Nombre/Título Básico <span>*</span></label>
+                        <div class="input-with-button">
+                            <input type="text" class="form-input" id="name" name="name" required placeholder="Ej: Mouse gaming RGB">
+                            <button type="button" class="btn-optimize" id="optimizeBtn" onclick="optimizeTitle()">
+                                ✨ Optimizar
+                            </button>
+                        </div>
+                        <div class="form-help">Escribe un título básico y optimízalo para Mercado Libre</div>
+                        
+                        <div class="suggestion-box" id="suggestionBox">
+                            <div class="suggestion-title">💡 Título Optimizado Sugerido:</div>
+                            <div class="suggestion-text" id="suggestedTitle"></div>
+                            <button type="button" class="btn-use-suggestion" onclick="useSuggestion()">
+                                Usar este título
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-textarea" id="description" name="description" placeholder="Describe las características principales del producto..."></textarea>
+                        <div class="form-help">Máximo 5000 caracteres</div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Categoría</label>
+                            <input type="text" class="form-input" id="category" name="category" placeholder="Ej: Electrónica">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Stock Disponible <span>*</span></label>
+                            <input type="number" class="form-input" id="stock" name="stock" required min="0" value="0" placeholder="Ej: 100">
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Nombre del Producto <span>*</span></label>
-                    <input type="text" class="form-input" id="name" name="name" required placeholder="Ej: Audífonos Bluetooth Premium">
-                    <div class="form-help">Máximo 60 caracteres para Mercado Libre</div>
+                <!-- Costos y Precios -->
+                <div class="form-section">
+                    <h3 class="section-title">💰 Costos y Precios</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Costo Base (MXN) <span>*</span></label>
+                            <input type="number" class="form-input" id="base_cost" name="base_cost" required step="0.01" min="0" placeholder="Ej: 150.00">
+                            <div class="form-help">Precio de costo sin IVA</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Costo de Envío (MXN)</label>
+                            <input type="number" class="form-input" id="shipping_cost" name="shipping_cost" step="0.01" min="0" value="0" placeholder="Ej: 50.00">
+                            <div class="form-help">0 = Envío gratis</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Publicación <span>*</span></label>
+                        <select class="form-select" id="listing_type" name="listing_type" required>
+                            <option value="gold_special">Premium (gold_special) - Mayor visibilidad</option>
+                            <option value="free">Gratis (free) - Sin costo de publicación</option>
+                        </select>
+                        <div class="form-help">Premium tiene comisión más alta pero mayor alcance</div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Costo Base (MXN) <span>*</span></label>
-                    <input type="number" class="form-input" id="base_cost" name="base_cost" required step="0.01" min="0" placeholder="Ej: 150.00">
-                    <div class="form-help">Precio de costo sin IVA</div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Stock Disponible <span>*</span></label>
-                    <input type="number" class="form-input" id="stock" name="stock" required min="0" value="0" placeholder="Ej: 100">
-                    <div class="form-help">Cantidad de unidades disponibles</div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Categoría</label>
-                    <input type="text" class="form-input" id="category" name="category" placeholder="Ej: Electrónica">
-                    <div class="form-help">Categoría del producto (opcional)</div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">URL de Imagen</label>
-                    <input type="url" class="form-input" id="images" name="images" placeholder="https://ejemplo.com/imagen.jpg">
-                    <div class="form-help">URL de la imagen principal (opcional)</div>
+                <!-- Imágenes -->
+                <div class="form-section">
+                    <h3 class="section-title">🖼️ Imágenes</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">URL de Imagen Principal</label>
+                        <input type="url" class="form-input" id="images" name="images" placeholder="https://ejemplo.com/imagen.jpg">
+                        <div class="form-help">URL de la imagen principal (opcional)</div>
+                    </div>
                 </div>
 
                 <div class="preview-section" id="previewSection">
-                    <div class="preview-title">Vista Previa del Cálculo</div>
+                    <div class="preview-title">📊 Vista Previa del Cálculo</div>
                     <div class="preview-item">
                         <span class="preview-label">Costo base:</span>
                         <span class="preview-value" id="previewCost">$0.00</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Costo de envío:</span>
+                        <span class="preview-value" id="previewShipping">$0.00</span>
                     </div>
                     <div class="preview-item">
                         <span class="preview-label">Precio estimado:</span>
@@ -293,22 +448,29 @@
     <script>
         const form = document.getElementById('productForm');
         const baseCostInput = document.getElementById('base_cost');
+        const shippingCostInput = document.getElementById('shipping_cost');
         const previewSection = document.getElementById('previewSection');
         const loading = document.getElementById('loading');
         const submitBtn = document.getElementById('submitBtn');
         const successMessage = document.getElementById('successMessage');
         const errorMessage = document.getElementById('errorMessage');
+        const optimizeBtn = document.getElementById('optimizeBtn');
+        const suggestionBox = document.getElementById('suggestionBox');
+        
+        let suggestedTitleText = '';
 
-        // Update preview when cost changes
-        baseCostInput.addEventListener('input', function() {
-            const cost = parseFloat(this.value) || 0;
+        // Update preview when costs change
+        function updatePreview() {
+            const cost = parseFloat(baseCostInput.value) || 0;
+            const shipping = parseFloat(shippingCostInput.value) || 0;
             
             if (cost > 0) {
                 // Estimate price (simplified calculation)
-                const estimatedPrice = cost * 2.37; // ~40% margin after costs
+                const estimatedPrice = (cost + shipping) * 2.37;
                 const estimatedMargin = 35;
                 
                 document.getElementById('previewCost').textContent = `$${cost.toFixed(2)}`;
+                document.getElementById('previewShipping').textContent = `$${shipping.toFixed(2)}`;
                 document.getElementById('previewPrice').textContent = `$${estimatedPrice.toFixed(2)}`;
                 document.getElementById('previewMargin').textContent = `~${estimatedMargin}%`;
                 
@@ -316,7 +478,53 @@
             } else {
                 previewSection.classList.remove('active');
             }
-        });
+        }
+        
+        baseCostInput.addEventListener('input', updatePreview);
+        shippingCostInput.addEventListener('input', updatePreview);
+
+        // Optimize title
+        async function optimizeTitle() {
+            const basicTitle = document.getElementById('name').value.trim();
+            
+            if (!basicTitle) {
+                alert('Por favor escribe un título básico primero');
+                return;
+            }
+            
+            optimizeBtn.disabled = true;
+            optimizeBtn.textContent = '⏳ Optimizando...';
+            
+            try {
+                const response = await fetch('/api/products/optimize-title', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title: basicTitle })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.optimized_title) {
+                    suggestedTitleText = result.optimized_title;
+                    document.getElementById('suggestedTitle').textContent = suggestedTitleText;
+                    suggestionBox.classList.add('active');
+                } else {
+                    alert('No se pudo optimizar el título. Intenta con otro nombre.');
+                }
+            } catch (error) {
+                alert('Error al optimizar título: ' + error.message);
+            } finally {
+                optimizeBtn.disabled = false;
+                optimizeBtn.textContent = '✨ Optimizar';
+            }
+        }
+        
+        function useSuggestion() {
+            document.getElementById('name').value = suggestedTitleText;
+            suggestionBox.classList.remove('active');
+        }
 
         // Handle form submission
         form.addEventListener('submit', async function(e) {
@@ -334,9 +542,12 @@
             const formData = {
                 sku: document.getElementById('sku').value,
                 name: document.getElementById('name').value,
+                description: document.getElementById('description').value || null,
                 base_cost: parseFloat(document.getElementById('base_cost').value),
+                shipping_cost: parseFloat(document.getElementById('shipping_cost').value) || 0,
                 stock: parseInt(document.getElementById('stock').value),
                 category: document.getElementById('category').value || null,
+                listing_type: document.getElementById('listing_type').value,
                 images: document.getElementById('images').value ? [document.getElementById('images').value] : []
             };
             
@@ -359,6 +570,7 @@
                     // Reset form
                     form.reset();
                     previewSection.classList.remove('active');
+                    suggestionBox.classList.remove('active');
                     
                     // Redirect after 2 seconds
                     setTimeout(() => {
