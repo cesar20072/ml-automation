@@ -119,9 +119,9 @@ class ProductManager:
         """
         try:
             # Search similar products on ML
-            search_results = await ml_api.search(basic_title, limit=10)
+            search_results = await ml_api.search_items(basic_title, limit=10)
             
-            if not search_results or 'results' not in search_results:
+            if not search_results:
                 logger.warning(f"No search results for title optimization: {basic_title}")
                 return None
             
